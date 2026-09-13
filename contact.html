@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact — TasteAI</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav-bar" aria-label="Main navigation">
+        <a class="brand" href="index.html">Taste<span>AI</span></a>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="menu.html">Menu</a></li>
+          <li><a href="ai.html">AI Recommendation</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <button
+          class="hamburger"
+          aria-label="Toggle menu"
+          aria-expanded="false"
+        >
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <section>
+        <div class="container contact-layout">
+          <article class="contact-info-card">
+            <h1>Get in touch</h1>
+            <p>
+              Questions, feedback, or catering enquiries — reach out any time.
+            </p>
+            <ul class="contact-info-list">
+              <li>
+                <span class="icon">📍</span
+                ><span>Lahore, Punjab, Pakistan</span>
+              </li>
+              <li><span class="icon">📞</span><span>+92 300 1234567</span></li>
+              <li>
+                <span class="icon">✉️</span><span>hello@tasteai.example</span>
+              </li>
+              <li>
+                <span class="icon">🕑</span
+                ><span>Open daily, 12 PM – 11 PM</span>
+              </li>
+            </ul>
+          </article>
+
+          <article>
+            <div class="form-success" id="form-success">
+              Thanks — your message has been sent. We'll get back to you soon.
+            </div>
+            <form class="form-card" id="contact-form" novalidate>
+              <div class="field">
+                <label for="name">Full name</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  placeholder="Your name"
+                />
+                <div class="field-error" id="name-error"></div>
+              </div>
+
+              <div class="field">
+                <label for="email">Email address</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="you@example.com"
+                />
+                <div class="field-error" id="email-error"></div>
+              </div>
+
+              <div class="field">
+                <label for="phone">Phone number (optional)</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  placeholder="03xx xxxxxxx"
+                />
+                <div class="field-error" id="phone-error"></div>
+              </div>
+
+              <div class="field">
+                <label for="message">Message</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  placeholder="How can we help?"
+                ></textarea>
+                <div class="field-error" id="message-error"></div>
+              </div>
+
+              <button type="submit" class="btn btn-primary">
+                Send Message
+              </button>
+            </form>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <a class="brand" href="index.html">Taste<span>AI</span></a>
+          <p class="footer-note">Smart food recommendations, no guesswork.</p>
+        </div>
+        <div>
+          <p class="footer-note">📞 +92 300 1234567<br />📍 Lahore, Pakistan</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/contact.js"></script>
+  </body>
+</html>
