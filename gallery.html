@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gallery — TasteAI</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav-bar" aria-label="Main navigation">
+        <a class="brand" href="index.html">Taste<span>AI</span></a>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="menu.html">Menu</a></li>
+          <li><a href="ai.html">AI Recommendation</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <button
+          class="hamburger"
+          aria-label="Toggle menu"
+          aria-expanded="false"
+        >
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <section>
+        <div class="container">
+          <div class="section-head">
+            <h1>Gallery</h1>
+            <p>Tap a dish for a closer look.</p>
+          </div>
+          <div class="gallery-grid" id="gallery-grid">
+            <!-- Filled by js/gallery.js -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="lightbox" id="lightbox">
+      <div class="lightbox-card">
+        <button class="lightbox-close" id="lightbox-close" aria-label="Close">
+          ✕
+        </button>
+        <div class="lightbox-tile" id="lightbox-tile"></div>
+        <h3 id="lightbox-name"></h3>
+        <p id="lightbox-description"></p>
+        <span class="dish-price" id="lightbox-price"></span>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <a class="brand" href="index.html">Taste<span>AI</span></a>
+          <p class="footer-note">Smart food recommendations, no guesswork.</p>
+        </div>
+        <div>
+          <p class="footer-note">📞 +92 300 1234567<br />📍 Lahore, Pakistan</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/food-api.js"></script>
+    <script src="js/gallery.js"></script>
+  </body>
+</html>
