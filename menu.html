@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Menu — TasteAI</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav-bar" aria-label="Main navigation">
+        <a class="brand" href="index.html">Taste<span>AI</span></a>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="menu.html">Menu</a></li>
+          <li><a href="ai.html">AI Recommendation</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <button
+          class="hamburger"
+          aria-label="Toggle menu"
+          aria-expanded="false"
+        >
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <section>
+        <div class="container">
+          <div class="section-head">
+            <h1>The full menu</h1>
+            <p>
+              Filter by cuisine to narrow things down, or scroll through
+              everything.
+            </p>
+          </div>
+
+          <div
+            class="filter-bar"
+            id="filter-bar"
+            role="group"
+            aria-label="Filter by category"
+          >
+            <button class="filter-pill active" data-category="All">All</button>
+            <button class="filter-pill" data-category="Pakistani">
+              Pakistani
+            </button>
+            <button class="filter-pill" data-category="Fast Food">
+              Fast Food
+            </button>
+            <button class="filter-pill" data-category="Chinese">Chinese</button>
+            <button class="filter-pill" data-category="Continental">
+              Continental
+            </button>
+            <button class="filter-pill" data-category="Desserts">
+              Desserts
+            </button>
+            <button class="filter-pill" data-category="Drinks">Drinks</button>
+          </div>
+
+          <div class="card-grid" id="menu-grid">
+            <!-- Filled by js/menu.js -->
+          </div>
+          <div class="empty-state" id="empty-state" style="display: none">
+            <p>No dishes in this category yet.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <a class="brand" href="index.html">Taste<span>AI</span></a>
+          <p class="footer-note">Smart food recommendations, no guesswork.</p>
+        </div>
+        <div>
+          <p class="footer-note">📞 +92 300 1234567<br />📍 Lahore, Pakistan</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/food-api.js"></script>
+    <script src="js/menu.js"></script>
+  </body>
+</html>

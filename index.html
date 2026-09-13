@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TasteAI — Smart Food Explorer</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav-bar" aria-label="Main navigation">
+        <a class="brand" href="index.html">Taste<span>AI</span></a>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="menu.html">Menu</a></li>
+          <li><a href="ai.html">AI Recommendation</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <button
+          class="hamburger"
+          aria-label="Toggle menu"
+          aria-expanded="false"
+        >
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">🍽 Smart Food Explorer</p>
+            <h1>Tell us your mood.<br />We'll tell you what to eat.</h1>
+            <p class="lead">
+              TasteAI matches your cravings, your appetite and the kind of food
+              you're after to a dish worth ordering — in seconds.
+            </p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="ai.html">Get a Recommendation</a>
+              <a class="btn btn-outline" href="menu.html">Browse the Menu</a>
+            </div>
+          </div>
+          <div class="spice-board" aria-hidden="true">
+            <div class="spice-chip">
+              <span class="emoji">🌶️</span><span class="label">Spicy</span>
+            </div>
+            <div class="spice-chip">
+              <span class="emoji">🍚</span><span class="label">Comfort</span>
+            </div>
+            <div class="spice-chip">
+              <span class="emoji">🍮</span><span class="label">Sweet</span>
+            </div>
+            <div class="spice-chip">
+              <span class="emoji">🥗</span><span class="label">Light</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="how-it-works">
+        <div class="container">
+          <div class="section-head">
+            <h2>How it works</h2>
+            <p>Three quick questions stand between you and your next meal.</p>
+          </div>
+          <div class="steps">
+            <article class="step-card">
+              <div class="step-index">01</div>
+              <h3>Set your mood</h3>
+              <p>
+                Spicy, mild, sweet or something light — tell TasteAI what you're
+                craving right now.
+              </p>
+            </article>
+            <article class="step-card">
+              <div class="step-index">02</div>
+              <h3>Pick a cuisine</h3>
+              <p>
+                Pakistani, fast food, Chinese, continental, desserts or drinks.
+              </p>
+            </article>
+            <article class="step-card">
+              <div class="step-index">03</div>
+              <h3>Get matched</h3>
+              <p>
+                TasteAI scores the menu against your answers and hands you a
+                dish, plus three backups.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="featured">
+        <div class="container">
+          <div class="section-head">
+            <h2>Crowd favourites</h2>
+            <p>A few dishes people keep coming back for.</p>
+          </div>
+          <div class="card-grid" id="featured-grid">
+            <!-- Filled by JS from data/menu.json -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <a class="brand" href="index.html">Taste<span>AI</span></a>
+          <p class="footer-note">Smart food recommendations, no guesswork.</p>
+        </div>
+        <div>
+          <p class="footer-note">📞 +92 300 1234567<br />📍 Lahore, Pakistan</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+      // Load three featured dishes on the home page.
+      fetch("data/menu.json")
+        .then(function (res) {
+          return res.json();
+        })
+        .then(function (dishes) {
+          var featured = dishes.filter(function (d) {
+            return (
+              ["chicken-karahi", "chicken-biryani", "zinger-burger"].indexOf(
+                d.id,
+              ) !== -1
+            );
+          });
+          var grid = document.getElementById("featured-grid");
+          grid.innerHTML = featured
+            .map(function (d) {
+              return (
+                '<article class="dish-card">' +
+                '<div class="dish-tile ' +
+                d.tile +
+                '">' +
+                d.emoji +
+                "</div>" +
+                '<div class="dish-body">' +
+                '<div class="dish-top"><h3>' +
+                d.name +
+                '</h3><span class="dish-price">' +
+                d.price +
+                "</span></div>" +
+                '<span class="dish-category">' +
+                d.category +
+                "</span>" +
+                "<p>" +
+                d.description +
+                "</p>" +
+                "</div>" +
+                "</article>"
+              );
+            })
+            .join("");
+        })
+        .catch(function () {
+          document.getElementById("featured-grid").innerHTML =
+            "<p>Couldn't load dishes right now.</p>";
+        });
+    </script>
+  </body>
+</html>
