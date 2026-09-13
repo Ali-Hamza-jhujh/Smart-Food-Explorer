@@ -1,177 +1,204 @@
-// ai.js
-//
-// This file is the "AI" part of TasteAI. It sends the user's mood / cuisine /
-// hunger answers to Google's Gemini API, grounded on our own dish list, and
-// asks it to reply with strict JSON naming which dish to recommend and why:
-//
-//   user picks options -> getRecommendation() -> fetch() -> Gemini API
-//   -> JSON response -> JavaScript extracts the pick -> DOM shows the result
-//
-// SECURITY NOTE (say this in your viva):
-// GEMINI_API_KEY lives in js/config.js and is visible to anyone who views
-// this page's source — that is unavoidable for a fully static site with no
-// backend. In a production app, this fetch() would instead hit your own
-// backend or serverless function (e.g. POST /api/recommend), which holds the
-// real key on the server and calls Gemini from there. The frontend code
-// below would stay almost identical either way.
-//
-// If the Gemini call fails (no key set, no internet, quota hit, bad JSON
-// back) the app falls back to a small local scoring function so the page
-// never breaks during a demo.
+/* =========================================================
+   ai.js — the AI Food Assistant
+   ---------------------------------------------------------
+   HOW TO CONNECT YOUR OWN GEMINI KEY
+   1. Get a free key from https://aistudio.google.com/apikey
+   2. Paste it below as GEMINI_API_KEY.
+   3. That's it — generateRecommendation() will call Gemini
+      automatically. Without a key, the page still works: it
+      falls back to a local rule-based recommendation so the
+      demo never breaks.
 
-document.addEventListener('DOMContentLoaded', function () {
-  var form = document.getElementById('ai-form');
-  if (!form) return;
+   ⚠️ This key is visible to anyone who views the page source.
+   That's fine for a class project / demo, but never do this
+   in a real product — in production, this call should go
+   through a backend or serverless proxy that holds the key.
+   ========================================================= */
 
-  var placeholder = document.getElementById('result-placeholder');
-  var loader = document.getElementById('loader');
-  var resultContent = document.getElementById('result-content');
+const GEMINI_API_KEY = 'AQ.Ab8RN6JhSBHHuY9nxpFkLlnIkrsVHzW7h3TPBKgGcWV2H8R83g';
+const GEMINI_MODEL = 'gemini-2.0-flash';
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
-  var hungerLabels = {
-    snack: 'just want a snack',
-    moderate: 'are moderately hungry',
-    very: 'are very hungry',
-    starving: 'are starving'
+const aiForm = document.getElementById('aiForm');
+const aiLoader = document.getElementById('aiLoader');
+const aiPlaceholder = document.getElementById('aiPlaceholder');
+const resultCard = document.getElementById('resultCard');
+const aiError = document.getElementById('aiError');
+
+/**
+ * A small local knowledge base used two ways:
+ *  1. As the fallback "AI" when no Gemini key is set.
+ *  2. As a safety net if Gemini returns a dish TheMealDB doesn't have.
+ * Keyed by cuisine -> mood, each entry lists a main pick and backups.
+ */
+const LOCAL_RECOMMENDATIONS = {
+  pakistani: {
+    default: { dish: 'Chicken Karahi', backups: ['Chicken Biryani', 'Seekh Kebab', 'Mutton Karahi'] },
+    Sweet: { dish: 'Gulab Jamun', backups: ['Kheer', 'Sheer Khurma'] },
+  },
+  chinese: {
+    default: { dish: 'Kung Pao Chicken', backups: ['Chow Mein', 'Spring Rolls', 'Sweet and Sour Pork'] },
+  },
+  italian: {
+    default: { dish: 'Chicken Parmentier', backups: ['Spaghetti Carbonara', 'Margherita Pizza', 'Lasagne'] },
+  },
+  mexican: {
+    default: { dish: 'Chicken Enchiladas', backups: ['Beef Tacos', 'Chilli Con Carne', 'Nachos'] },
+  },
+  american: {
+    default: { dish: 'BBQ Pulled Pork', backups: ['Classic Burger', 'Mac and Cheese', 'Fried Chicken'] },
+  },
+  mediterranean: {
+    default: { dish: 'Greek Salad', backups: ['Chicken Souvlaki', 'Falafel', 'Moussaka'] },
+  },
+  japanese: {
+    default: { dish: 'Chicken Katsu', backups: ['Teriyaki Salmon', 'Ramen', 'Gyoza'] },
+  },
+  thai: {
+    default: { dish: 'Thai Green Curry', backups: ['Pad Thai', 'Tom Yum Soup', 'Mango Sticky Rice'] },
+  },
+};
+
+function localRecommendation(mood, cuisine, hunger) {
+  const cuisineData = LOCAL_RECOMMENDATIONS[cuisine] || LOCAL_RECOMMENDATIONS.pakistani;
+  const pick = cuisineData[mood] || cuisineData.default;
+  const portionNote = hunger === 'Very Hungry'
+    ? 'a hearty, filling meal'
+    : hunger === 'Just a Snack'
+      ? 'something light you can eat quickly'
+      : 'a satisfying, medium-size plate';
+  return {
+    dish: pick.dish,
+    reason: `You selected ${mood.toLowerCase()} ${cuisineLabel(cuisine)} food and asked for ${portionNote}, so ${pick.dish} is the closest match on the menu.`,
+    alternatives: pick.backups,
   };
+}
 
-  var allDishes = [];
+function cuisineLabel(value) {
+  const map = {
+    pakistani: 'Pakistani', chinese: 'Chinese', italian: 'Italian', mexican: 'Mexican',
+    american: 'American', mediterranean: 'Mediterranean', japanese: 'Japanese', thai: 'Thai',
+  };
+  return map[value] || value;
+}
 
-  fetch('data/menu.json')
-    .then(function (res) { return res.json(); })
-    .then(function (dishes) { allDishes = dishes; })
-    .catch(function () { /* handled again on submit if this failed */ });
+/** Calls Gemini and asks it to return strict JSON we can parse safely. */
+async function askGemini(mood, cuisine, hunger) {
+  const prompt = `You are a food recommendation assistant for a ${cuisineLabel(cuisine)} restaurant menu.
+A customer is in the mood for "${mood}" food and describes their hunger as "${hunger}".
+Recommend exactly one real, well-known ${cuisineLabel(cuisine)} dish that fits, plus three alternative dishes from the same cuisine.
+Respond with ONLY valid JSON, no markdown, in exactly this shape:
+{"dish": "Dish Name", "reason": "one short sentence explaining why it fits", "alternatives": ["Dish A", "Dish B", "Dish C"]}`;
 
-  form.addEventListener('submit', function (event) {
-    event.preventDefault();
-
-    var mood = form.mood.value;
-    var type = form.type.value;
-    var hunger = form.hunger.value;
-
-    if (!validateForm(mood, type, hunger)) return;
-
-    getRecommendation(mood, type, hunger);
+  const response = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.7, maxOutputTokens: 300 },
+    }),
   });
 
-  function validateForm(mood, type, hunger) {
-    var valid = true;
-    valid = validateField('mood', mood) && valid;
-    valid = validateField('type', type) && valid;
-    valid = validateField('hunger', hunger) && valid;
-    return valid;
-  }
+  if (!response.ok) throw new Error(`Gemini request failed (${response.status})`);
 
-  function validateField(name, value) {
-    var field = document.getElementById(name);
-    var errorBox = document.getElementById(name + '-error');
-    var wrapper = field.closest('.field');
-    if (!value) {
-      errorBox.textContent = 'Please make a selection.';
-      wrapper.classList.add('has-error');
-      return false;
+  const data = await response.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  const cleaned = text.replace(/```json|```/g, '').trim();
+  const parsed = JSON.parse(cleaned);
+
+  if (!parsed.dish || !Array.isArray(parsed.alternatives)) {
+    throw new Error('Gemini returned an unexpected shape');
+  }
+  return parsed;
+}
+
+/** Tries to find a real TheMealDB entry for a dish name; falls back to a cuisine-area sample. */
+async function matchRealDish(dishName, cuisine) {
+  try {
+    const matches = await searchMealsByName(dishName);
+    if (matches.length) return matches[0];
+  } catch (err) {
+    /* fall through to area fallback below */
+  }
+  try {
+    const area = CUISINE_TO_AREA[cuisine] || 'Indian';
+    const areaMeals = await getMealsByArea(area);
+    if (areaMeals.length) {
+      const random = areaMeals[Math.floor(Math.random() * areaMeals.length)];
+      return await getMealById(random.idMeal);
     }
-    errorBox.textContent = '';
-    wrapper.classList.remove('has-error');
-    return true;
+  } catch (err) {
+    /* no match available */
+  }
+  return null;
+}
+
+function renderResult(recommendation, realDish, cuisine) {
+  document.getElementById('resultName').textContent = recommendation.dish;
+  document.getElementById('resultWhy').textContent = recommendation.reason;
+  document.getElementById('resultCuisineTag').textContent = cuisineLabel(cuisine);
+
+  const img = document.getElementById('resultImg');
+  const detailLink = document.getElementById('resultDetailLink');
+
+  if (realDish) {
+    img.src = realDish.strMealThumb;
+    img.alt = realDish.strMeal;
+    detailLink.href = `product.html?id=${realDish.idMeal}`;
+    detailLink.style.display = 'inline-flex';
+  } else {
+    img.src = '';
+    img.alt = '';
+    detailLink.style.display = 'none';
   }
 
-  // The single function that is "the AI part" of the assignment.
-  function getRecommendation(mood, type, hunger) {
-    placeholder.style.display = 'none';
-    resultContent.classList.remove('is-visible');
-    loader.classList.add('is-active');
+  const list = document.getElementById('alsoLikeList');
+  list.innerHTML = recommendation.alternatives
+    .slice(0, 4)
+    .map((name) => `<li><span>${escapeHTML(name)}</span></li>`)
+    .join('');
 
-    var pool = allDishes.filter(function (d) { return d.category === type; });
-    if (pool.length === 0) pool = allDishes.slice();
+  resultCard.classList.add('active');
+}
 
-    askGemini(mood, type, hunger, pool)
-      .then(function (picked) {
-        renderResult(picked.top, picked.suggestions, mood, type, hunger, picked.why);
-      })
-      .catch(function (err) {
-        console.warn('Gemini call failed, using local fallback:', err.message);
-        var ranked = scoreDishesLocally(pool, mood, hunger);
-        var why = 'You selected ' + mood + ' ' + type + ' food and said you ' + hungerLabels[hunger] + '.';
-        renderResult(ranked[0], ranked.slice(1, 4), mood, type, hunger, why);
-      });
-  }
+/**
+ * The single entry point that runs the whole AI flow:
+ * form values -> Gemini (or local fallback) -> real dish match -> render.
+ */
+async function generateRecommendation(mood, cuisine, hunger) {
+  aiPlaceholder.style.display = 'none';
+  aiError.classList.remove('active');
+  resultCard.classList.remove('active');
+  showLoader(aiLoader);
 
-  // Calls the Gemini API and asks it to choose from our own dish list.
-  function askGemini(mood, type, hunger, pool) {
-    if (!window.GEMINI_API_KEY || window.GEMINI_API_KEY.indexOf('PASTE_YOUR') === 0) {
-      return Promise.reject(new Error('No Gemini API key set in js/config.js'));
+  let recommendation;
+  let usedFallback = false;
+
+  try {
+    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
+      throw new Error('No Gemini API key configured');
     }
-
-    var menuForPrompt = pool.map(function (d) {
-      return { id: d.id, name: d.name, tags: d.mood, heaviness: d.heaviness, description: d.description };
-    });
-
-    var prompt =
-      'You are a food recommendation assistant for a ' + type + ' restaurant menu.\n' +
-      'The customer is in the mood for something "' + mood + '" and ' + hungerLabels[hunger] + '.\n' +
-      'Pick exactly ONE dish id from this list that best fits, plus up to 3 other ids as backups:\n' +
-      JSON.stringify(menuForPrompt) + '\n' +
-      'Reply with ONLY raw JSON, no markdown fences, in this exact shape:\n' +
-      '{"recommended_id": "id", "why": "one short friendly sentence", "also_like_ids": ["id","id","id"]}';
-
-    var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + window.GEMINI_API_KEY;
-
-    return fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-    })
-      .then(function (response) {
-        if (!response.ok) throw new Error('Gemini request failed: ' + response.status);
-        return response.json();
-      })
-      .then(function (data) {
-        var text = data.candidates[0].content.parts[0].text;
-        var clean = text.replace(/```json/g, '').replace(/```/g, '').trim();
-        var parsed = JSON.parse(clean);
-
-        var top = allDishes.find(function (d) { return d.id === parsed.recommended_id; });
-        var suggestions = (parsed.also_like_ids || [])
-          .map(function (id) { return allDishes.find(function (d) { return d.id === id; }); })
-          .filter(Boolean);
-
-        if (!top) throw new Error('Gemini returned an unknown dish id');
-
-        return { top: top, suggestions: suggestions.slice(0, 3), why: parsed.why };
-      });
+    recommendation = await askGemini(mood, cuisine, hunger);
+  } catch (err) {
+    usedFallback = true;
+    recommendation = localRecommendation(mood, cuisine, hunger);
   }
 
-  // Local fallback used only if the Gemini call above fails for any reason.
-  function scoreDishesLocally(pool, mood, hunger) {
-    var hungerToHeaviness = { snack: 'light', moderate: 'medium', very: 'heavy', starving: 'heavy' };
-    var target = hungerToHeaviness[hunger];
+  const realDish = await matchRealDish(recommendation.dish, cuisine);
 
-    var scored = pool.map(function (d) {
-      var score = 0;
-      if (d.mood.indexOf(mood) !== -1) score += 2;
-      if (d.heaviness === target) score += 2;
-      else if (target === 'heavy' && d.heaviness === 'medium') score += 1;
-      return { dish: d, score: score };
-    });
-    scored.sort(function (a, b) { return b.score - a.score; });
-    return scored.map(function (s) { return s.dish; });
+  hideLoader(aiLoader);
+  renderResult(recommendation, realDish, cuisine);
+
+  if (usedFallback) {
+    aiError.textContent = 'Running in demo mode (no Gemini API key set) — showing a rule-based recommendation instead of a live AI response.';
+    aiError.classList.add('active');
   }
+}
 
-  function renderResult(top, suggestions, mood, type, hunger, why) {
-    loader.classList.remove('is-active');
-
-    document.getElementById('result-tile').className = 'emoji-badge ' + top.tile;
-    document.getElementById('result-emoji').textContent = top.emoji;
-    document.getElementById('result-name').textContent = top.name;
-    document.getElementById('result-price').textContent = top.price;
-    document.getElementById('result-description').textContent = top.description;
-    document.getElementById('result-why').textContent = why;
-
-    var list = document.getElementById('also-like-list');
-    list.innerHTML = suggestions.map(function (d) {
-      return '<li><span>' + d.emoji + ' ' + d.name + '</span><span class="dish-price">' + d.price + '</span></li>';
-    }).join('');
-
-    resultContent.classList.add('is-visible');
-  }
+aiForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const mood = document.getElementById('moodSelect').value;
+  const cuisine = document.getElementById('cuisineSelect').value;
+  const hunger = document.getElementById('hungerSelect').value;
+  generateRecommendation(mood, cuisine, hunger);
 });

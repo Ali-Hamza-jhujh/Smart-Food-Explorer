@@ -1,170 +1,125 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TasteAI — Smart Food Explorer</title>
-    <link rel="stylesheet" href="css/style.css" />
-  </head>
-  <body>
-    <header class="site-header">
-      <nav class="nav-bar" aria-label="Main navigation">
-        <a class="brand" href="index.html">Taste<span>AI</span></a>
-        <ul class="nav-links">
-          <li><a href="index.html">Home</a></li>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TasteAI — Smart Food Explorer</title>
+<meta name="description" content="TasteAI pairs real, everyday recipes with an AI assistant that recommends a dish based on your mood, cuisine and hunger level.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="home">
+
+<header class="site-header">
+  <nav class="nav-bar" aria-label="Primary">
+    <a href="index.html" class="brand">
+      <span class="brand-mark">TasteAI</span>
+      <span class="brand-sub">Smart Food Explorer</span>
+    </a>
+    <button class="hamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html" data-page="home">Home</a></li>
+      <li><a href="menu.html" data-page="menu">Menu</a></li>
+      <li><a href="ai.html" data-page="ai">AI Recommendation</a></li>
+      <li><a href="gallery.html" data-page="gallery">Gallery</a></li>
+      <li><a href="contact.html" data-page="contact">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <section>
+    <div class="wrap hero">
+      <div class="hero-copy">
+        <span class="tag">AI-assisted, recipe-backed</span>
+        <h1>Tell us what you're craving. We'll find the dish.</h1>
+        <p class="lede">TasteAI reads your mood, your cuisine, and how hungry you actually are — then matches you with a real dish, pulled from an open recipe database, photo and all.</p>
+        <div class="hero-actions">
+          <a href="ai.html" class="btn btn-primary">Try the AI Assistant</a>
+          <a href="menu.html" class="btn btn-outline">Browse the Menu</a>
+        </div>
+      </div>
+      <div class="hero-visual" id="heroVisual">
+        <img id="heroImg" src="" alt="" hidden>
+        <div class="gallery-caption" id="heroCaption" style="display:none;"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-alt">
+    <div class="wrap">
+      <div class="eyebrow-rule"><span>How it works</span></div>
+      <div class="steps">
+        <div class="step">
+          <span class="step-index">01</span>
+          <h3>Share your craving</h3>
+          <p>Pick a mood, a cuisine, and how hungry you are on the AI Recommendation page.</p>
+        </div>
+        <div class="step">
+          <span class="step-index">02</span>
+          <h3>The assistant matches a dish</h3>
+          <p>Your answers are sent to the AI, which reasons through them and names a dish and why it fits.</p>
+        </div>
+        <div class="step">
+          <span class="step-index">03</span>
+          <h3>Get the real recipe</h3>
+          <p>TasteAI pulls the actual photo, ingredients and instructions for that dish from an open recipe database.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="eyebrow-rule"><span>On the menu today</span></div>
+      <div class="dish-list" id="featuredDishes">
+        <div class="loader active" id="featuredLoader">
+          <span class="spinner" aria-hidden="true"></span> Loading dishes…
+        </div>
+      </div>
+      <div style="margin-top:28px;">
+        <a href="menu.html" class="btn btn-outline">View full menu</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <h4>TasteAI</h4>
+        <p>A small AI-assisted recipe explorer, built as a static front-end project. Food data and photos are served from the free, open TheMealDB recipe database.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul class="footer-links">
           <li><a href="menu.html">Menu</a></li>
           <li><a href="ai.html">AI Recommendation</a></li>
           <li><a href="gallery.html">Gallery</a></li>
-          <li><a href="contact.html">Contact</a></li>
         </ul>
-        <button
-          class="hamburger"
-          aria-label="Toggle menu"
-          aria-expanded="false"
-        >
-          <span></span><span></span><span></span>
-        </button>
-      </nav>
-    </header>
-
-    <main>
-      <section class="hero">
-        <div class="container hero-grid">
-          <div class="hero-copy">
-            <p class="eyebrow">🍽 Smart Food Explorer</p>
-            <h1>Tell us your mood.<br />We'll tell you what to eat.</h1>
-            <p class="lead">
-              TasteAI matches your cravings, your appetite and the kind of food
-              you're after to a dish worth ordering — in seconds.
-            </p>
-            <div class="hero-actions">
-              <a class="btn btn-primary" href="ai.html">Get a Recommendation</a>
-              <a class="btn btn-outline" href="menu.html">Browse the Menu</a>
-            </div>
-          </div>
-          <div class="spice-board" aria-hidden="true">
-            <div class="spice-chip">
-              <span class="emoji">🌶️</span><span class="label">Spicy</span>
-            </div>
-            <div class="spice-chip">
-              <span class="emoji">🍚</span><span class="label">Comfort</span>
-            </div>
-            <div class="spice-chip">
-              <span class="emoji">🍮</span><span class="label">Sweet</span>
-            </div>
-            <div class="spice-chip">
-              <span class="emoji">🥗</span><span class="label">Light</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="how-it-works">
-        <div class="container">
-          <div class="section-head">
-            <h2>How it works</h2>
-            <p>Three quick questions stand between you and your next meal.</p>
-          </div>
-          <div class="steps">
-            <article class="step-card">
-              <div class="step-index">01</div>
-              <h3>Set your mood</h3>
-              <p>
-                Spicy, mild, sweet or something light — tell TasteAI what you're
-                craving right now.
-              </p>
-            </article>
-            <article class="step-card">
-              <div class="step-index">02</div>
-              <h3>Pick a cuisine</h3>
-              <p>
-                Pakistani, fast food, Chinese, continental, desserts or drinks.
-              </p>
-            </article>
-            <article class="step-card">
-              <div class="step-index">03</div>
-              <h3>Get matched</h3>
-              <p>
-                TasteAI scores the menu against your answers and hands you a
-                dish, plus three backups.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="featured">
-        <div class="container">
-          <div class="section-head">
-            <h2>Crowd favourites</h2>
-            <p>A few dishes people keep coming back for.</p>
-          </div>
-          <div class="card-grid" id="featured-grid">
-            <!-- Filled by JS from data/menu.json -->
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="site-footer">
-      <div class="container footer-grid">
-        <div>
-          <a class="brand" href="index.html">Taste<span>AI</span></a>
-          <p class="footer-note">Smart food recommendations, no guesswork.</p>
-        </div>
-        <div>
-          <p class="footer-note">📞 +92 300 1234567<br />📍 Lahore, Pakistan</p>
-        </div>
       </div>
-    </footer>
+      <div>
+        <h4>Project</h4>
+        <ul class="footer-links">
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="https://www.themealdb.com/api.php" target="_blank" rel="noopener">Recipe data source</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 TasteAI. Built for demonstration purposes.</span>
+      <span>Recipe data &amp; photos courtesy of TheMealDB</span>
+    </div>
+  </div>
+</footer>
 
-    <script src="js/main.js"></script>
-    <script>
-      // Load three featured dishes on the home page.
-      fetch("data/menu.json")
-        .then(function (res) {
-          return res.json();
-        })
-        .then(function (dishes) {
-          var featured = dishes.filter(function (d) {
-            return (
-              ["chicken-karahi", "chicken-biryani", "zinger-burger"].indexOf(
-                d.id,
-              ) !== -1
-            );
-          });
-          var grid = document.getElementById("featured-grid");
-          grid.innerHTML = featured
-            .map(function (d) {
-              return (
-                '<article class="dish-card">' +
-                '<div class="dish-tile ' +
-                d.tile +
-                '">' +
-                d.emoji +
-                "</div>" +
-                '<div class="dish-body">' +
-                '<div class="dish-top"><h3>' +
-                d.name +
-                '</h3><span class="dish-price">' +
-                d.price +
-                "</span></div>" +
-                '<span class="dish-category">' +
-                d.category +
-                "</span>" +
-                "<p>" +
-                d.description +
-                "</p>" +
-                "</div>" +
-                "</article>"
-              );
-            })
-            .join("");
-        })
-        .catch(function () {
-          document.getElementById("featured-grid").innerHTML =
-            "<p>Couldn't load dishes right now.</p>";
-        });
-    </script>
-  </body>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script src="js/home.js"></script>
+</body>
 </html>

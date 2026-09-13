@@ -1,0 +1,165 @@
+/* =========================================================
+   TasteAI — Design tokens & base styles
+   Palette grounded in a spice market: parchment ivory,
+   burnt marigold, and deep basil green.
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Colour */
+  --bg: #f8f3e9;
+  --bg-alt: #efe6d3;
+  --surface: #ffffff;
+  --ink: #2b231c;
+  --ink-soft: #6b5f52;
+  --line: #ddd0b8;
+  --saffron: #c97a2b;
+  --saffron-deep: #a85f1b;
+  --saffron-tint: #f3ddc0;
+  --basil: #3f5d45;
+  --basil-deep: #2e4633;
+  --basil-tint: #dfe8dd;
+  --danger: #a83232;
+
+  /* Type */
+  --font-display: 'Fraunces', 'Iowan Old Style', serif;
+  --font-body: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Layout */
+  --content-width: 1120px;
+  --radius: 6px;
+  --shadow: 0 10px 30px -18px rgba(43, 35, 28, 0.35);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 0 0 0.5em;
+  color: var(--ink);
+}
+
+h1 { font-size: clamp(2.4rem, 4vw, 3.6rem); font-weight: 500; }
+h2 { font-size: clamp(1.7rem, 2.6vw, 2.3rem); }
+h3 { font-size: 1.3rem; }
+
+p { margin: 0 0 1em; color: var(--ink-soft); max-width: 62ch; }
+
+a { color: var(--basil-deep); }
+
+img { max-width: 100%; display: block; }
+
+.wrap {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+.eyebrow-rule {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 34px;
+}
+
+.eyebrow-rule span {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--saffron-deep);
+  white-space: nowrap;
+}
+
+.eyebrow-rule::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 26px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  font-family: var(--font-body);
+  font-size: 0.98rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn:active { transform: translateY(1px); }
+
+.btn-primary {
+  background: var(--saffron);
+  color: #fffaf2;
+}
+.btn-primary:hover { background: var(--saffron-deep); }
+
+.btn-outline {
+  background: transparent;
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.btn-outline:hover { border-color: var(--basil-deep); color: var(--basil-deep); }
+
+.btn-light {
+  background: #fffaf2;
+  color: var(--basil-deep);
+}
+.btn-light:hover { background: var(--saffron-tint); }
+
+:focus-visible {
+  outline: 3px solid var(--basil);
+  outline-offset: 2px;
+}
+
+section { padding: 76px 0; }
+
+.section-alt { background: var(--bg-alt); }
+
+.tag {
+  display: inline-block;
+  padding: 4px 11px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  background: var(--surface);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

@@ -1,148 +1,153 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Recommendation — TasteAI</title>
-    <link rel="stylesheet" href="css/style.css" />
-  </head>
-  <body>
-    <header class="site-header">
-      <nav class="nav-bar" aria-label="Main navigation">
-        <a class="brand" href="index.html">Taste<span>AI</span></a>
-        <ul class="nav-links">
-          <li><a href="index.html">Home</a></li>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Recommendation — TasteAI</title>
+<meta name="description" content="Tell the AI food assistant your mood, cuisine and hunger level, and get a real dish recommendation with photo and reasoning.">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="ai">
+
+<header class="site-header">
+  <nav class="nav-bar" aria-label="Primary">
+    <a href="index.html" class="brand">
+      <span class="brand-mark">TasteAI</span>
+      <span class="brand-sub">Smart Food Explorer</span>
+    </a>
+    <button class="hamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html" data-page="home">Home</a></li>
+      <li><a href="menu.html" data-page="menu">Menu</a></li>
+      <li><a href="ai.html" data-page="ai">AI Recommendation</a></li>
+      <li><a href="gallery.html" data-page="gallery">Gallery</a></li>
+      <li><a href="contact.html" data-page="contact">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <section>
+    <div class="wrap">
+      <div class="ai-shell">
+
+        <div class="ai-form-panel">
+          <span class="tag">🤖 AI Food Assistant</span>
+          <h1>What are you in the mood for?</h1>
+          <p>Answer three quick questions and the assistant will name a dish, explain why it fits, and suggest a few backups — matched against real recipes.</p>
+
+          <form class="ai-form" id="aiForm">
+            <div class="field">
+              <label for="moodSelect">What are you in the mood for?</label>
+              <select id="moodSelect" name="mood" required>
+                <option value="Spicy">Spicy</option>
+                <option value="Savory">Savory</option>
+                <option value="Sweet">Sweet</option>
+                <option value="Light &amp; Fresh">Light &amp; Fresh</option>
+                <option value="Comfort Food">Comfort Food</option>
+                <option value="Adventurous">Adventurous</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="cuisineSelect">What type of food?</label>
+              <select id="cuisineSelect" name="cuisine" required>
+                <option value="pakistani">Pakistani</option>
+                <option value="chinese">Chinese</option>
+                <option value="italian">Italian</option>
+                <option value="mexican">Mexican</option>
+                <option value="american">American</option>
+                <option value="mediterranean">Mediterranean</option>
+                <option value="japanese">Japanese</option>
+                <option value="thai">Thai</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="hungerSelect">How hungry are you?</label>
+              <select id="hungerSelect" name="hunger" required>
+                <option value="Just a Snack">Just a Snack</option>
+                <option value="Moderately Hungry">Moderately Hungry</option>
+                <option value="Very Hungry">Very Hungry</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="aiSubmit">Get Recommendation</button>
+          </form>
+        </div>
+
+        <div class="ai-result-panel">
+          <div class="loader" id="aiLoader">
+            <span class="spinner" aria-hidden="true"></span> Thinking through your craving…
+          </div>
+
+          <div class="ai-placeholder" id="aiPlaceholder">
+            <span class="big-icon">✨</span>
+            <p>Your recommendation will appear here — pick your mood, cuisine and hunger level, then hit “Get Recommendation.”</p>
+          </div>
+
+          <article class="result-card" id="resultCard">
+            <span class="tag">✨ AI Recommendation</span>
+            <div class="result-head">
+              <div class="result-thumb"><img id="resultImg" src="" alt=""></div>
+              <div class="result-title">
+                <h2 id="resultName">—</h2>
+                <span class="tag" id="resultCuisineTag">—</span>
+              </div>
+            </div>
+            <div class="result-why">
+              <p><strong>Why?</strong> <span id="resultWhy"></span></p>
+            </div>
+            <div class="also-like">
+              <h4>You may also like</h4>
+              <ul id="alsoLikeList"></ul>
+            </div>
+            <p style="margin-top:20px;"><a href="#" id="resultDetailLink" class="btn btn-outline">View full recipe</a></p>
+          </article>
+
+          <div class="ai-error" id="aiError"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <h4>TasteAI</h4>
+        <p>A small AI-assisted recipe explorer, built as a static front-end project.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul class="footer-links">
           <li><a href="menu.html">Menu</a></li>
           <li><a href="ai.html">AI Recommendation</a></li>
           <li><a href="gallery.html">Gallery</a></li>
-          <li><a href="contact.html">Contact</a></li>
         </ul>
-        <button
-          class="hamburger"
-          aria-label="Toggle menu"
-          aria-expanded="false"
-        >
-          <span></span><span></span><span></span>
-        </button>
-      </nav>
-    </header>
-
-    <main>
-      <section>
-        <div class="container ai-layout">
-          <article>
-            <div class="ai-panel-title">
-              <span class="badge">🤖</span>
-              <h1 style="margin: 0">AI Food Assistant</h1>
-            </div>
-
-            <form class="form-card" id="ai-form" novalidate>
-              <div class="field">
-                <label for="mood">What are you in the mood for?</label>
-                <select id="mood" name="mood" required>
-                  <option value="">Choose a mood</option>
-                  <option value="spicy">Spicy</option>
-                  <option value="mild">Mild</option>
-                  <option value="sweet">Sweet</option>
-                  <option value="savory">Savory</option>
-                  <option value="comfort">Comfort Food</option>
-                  <option value="light">Light</option>
-                </select>
-                <div class="field-error" id="mood-error"></div>
-              </div>
-
-              <div class="field">
-                <label for="type">What type of food?</label>
-                <select id="type" name="type" required>
-                  <option value="">Choose a cuisine</option>
-                  <option value="Pakistani">Pakistani</option>
-                  <option value="Fast Food">Fast Food</option>
-                  <option value="Chinese">Chinese</option>
-                  <option value="Continental">Continental</option>
-                  <option value="Desserts">Desserts</option>
-                  <option value="Drinks">Drinks</option>
-                </select>
-                <div class="field-error" id="type-error"></div>
-              </div>
-
-              <div class="field">
-                <label for="hunger">How hungry are you?</label>
-                <select id="hunger" name="hunger" required>
-                  <option value="">Choose your appetite</option>
-                  <option value="snack">Just a Snack</option>
-                  <option value="moderate">Moderately Hungry</option>
-                  <option value="very">Very Hungry</option>
-                  <option value="starving">Starving</option>
-                </select>
-                <div class="field-error" id="hunger-error"></div>
-              </div>
-
-              <button
-                type="submit"
-                class="btn btn-primary"
-                style="width: 100%; justify-content: center"
-              >
-                Get Recommendation
-              </button>
-            </form>
-          </article>
-
-          <div class="result-panel" id="result-panel">
-            <div class="result-placeholder" id="result-placeholder">
-              <span class="big-emoji">🍽️</span>
-              <p>Fill in the form and TasteAI will suggest your next meal.</p>
-            </div>
-
-            <div class="loader" id="loader">
-              <div class="spinner" aria-hidden="true"></div>
-              <span>Thinking about your cravings…</span>
-            </div>
-
-            <div class="result-content" id="result-content">
-              <p
-                class="eyebrow"
-                style="color: var(--color-gold); font-weight: 600"
-              >
-                ✨ AI Recommendation
-              </p>
-              <div class="result-hero">
-                <div class="emoji-badge" id="result-tile">
-                  <span id="result-emoji"></span>
-                </div>
-                <div>
-                  <h2 id="result-name" style="margin: 0"></h2>
-                  <span class="dish-price" id="result-price"></span>
-                </div>
-              </div>
-              <p id="result-description"></p>
-              <div class="result-why">
-                <strong>Why?</strong>
-                <p id="result-why" style="margin: 6px 0 0"></p>
-              </div>
-              <div class="also-like">
-                <strong>You may also like:</strong>
-                <ul id="also-like-list"></ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="site-footer">
-      <div class="container footer-grid">
-        <div>
-          <a class="brand" href="index.html">Taste<span>AI</span></a>
-          <p class="footer-note">Smart food recommendations, no guesswork.</p>
-        </div>
-        <div>
-          <p class="footer-note">📞 +92 300 1234567<br />📍 Lahore, Pakistan</p>
-        </div>
       </div>
-    </footer>
+      <div>
+        <h4>Project</h4>
+        <ul class="footer-links">
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="https://www.themealdb.com/api.php" target="_blank" rel="noopener">Recipe data source</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 TasteAI. Built for demonstration purposes.</span>
+      <span>Recipe data &amp; photos courtesy of TheMealDB</span>
+    </div>
+  </div>
+</footer>
 
-    <script src="js/main.js"></script>
-    <script src="js/config.js"></script>
-    <script src="js/ai.js"></script>
-  </body>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script src="js/ai.js"></script>
+</body>
 </html>

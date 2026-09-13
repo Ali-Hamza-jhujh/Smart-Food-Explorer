@@ -1,66 +1,32 @@
-// gallery.js
-// Renders every dish as a gallery tile and opens a lightbox with details on click.
+/* =========================================================
+   gallery.js — loads a grid of real dish photos from
+   several cuisines via TheMealDB.
+   ========================================================= */
 
-document.addEventListener('DOMContentLoaded', function () {
-  var grid = document.getElementById('gallery-grid');
-  var lightbox = document.getElementById('lightbox');
-  var lightboxClose = document.getElementById('lightbox-close');
+const GALLERY_AREAS = ['Indian', 'Italian', 'Chinese', 'Mexican', 'Japanese', 'American'];
 
-  fetch('data/menu.json')
-    .then(function (response) { return response.json(); })
-    .then(function (dishes) {
-      grid.innerHTML = dishes.map(function (d, index) {
-        return (
-          '<div class="gallery-item" data-index="' + index + '" tabindex="0" role="button" aria-label="View ' + d.name + '">' +
-            '<div class="tile-face ' + d.tile + '" data-dish-id="' + d.id + '">' + d.emoji + '</div>' +
-            '<div class="gallery-caption">' + d.name + '</div>' +
-          '</div>'
-        );
-      }).join('');
+function galleryItemHTML(meal) {
+  return `
+    <a class="gallery-item" href="product.html?id=${meal.idMeal}">
+      <img src="${meal.strMealThumb}" alt="${escapeHTML(meal.strMeal)}" loading="lazy">
+      <span class="gallery-caption">${escapeHTML(meal.strMeal)}</span>
+    </a>
+  `;
+}
 
-      // Best-effort: swap in a real photo from TheMealDB (free, no key) when it recognises the dish.
-      dishes.forEach(function (d) {
-        FoodAPI.findPhoto(d.name).then(function (photoUrl) {
-          if (!photoUrl) return;
-          var tile = grid.querySelector('.tile-face[data-dish-id="' + d.id + '"]');
-          if (tile) tile.innerHTML = '<img src="' + photoUrl + '" alt="' + d.name + '" loading="lazy">';
-        });
-      });
+async function loadGallery() {
+  const grid = document.getElementById('galleryGrid');
+  const loader = document.getElementById('galleryLoader');
 
-      grid.querySelectorAll('.gallery-item').forEach(function (item) {
-        item.addEventListener('click', function () {
-          openLightbox(dishes[Number(item.dataset.index)]);
-        });
-        item.addEventListener('keydown', function (event) {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            openLightbox(dishes[Number(item.dataset.index)]);
-          }
-        });
-      });
-    })
-    .catch(function () {
-      grid.innerHTML = '<p>Couldn\'t load the gallery right now.</p>';
-    });
-
-  function openLightbox(dish) {
-    document.getElementById('lightbox-tile').className = 'lightbox-tile ' + dish.tile;
-    document.getElementById('lightbox-tile').textContent = dish.emoji;
-    document.getElementById('lightbox-name').textContent = dish.name;
-    document.getElementById('lightbox-description').textContent = dish.description;
-    document.getElementById('lightbox-price').textContent = dish.price;
-    lightbox.classList.add('is-visible');
+  try {
+    const results = await Promise.all(GALLERY_AREAS.map((area) => getMealsByArea(area)));
+    const meals = results.flatMap((list) => list.slice(0, 4));
+    hideLoader(loader);
+    grid.innerHTML = meals.map(galleryItemHTML).join('');
+  } catch (err) {
+    hideLoader(loader);
+    grid.innerHTML = '<p>Photos could not be loaded right now — please refresh the page.</p>';
   }
+}
 
-  function closeLightbox() {
-    lightbox.classList.remove('is-visible');
-  }
-
-  lightboxClose.addEventListener('click', closeLightbox);
-  lightbox.addEventListener('click', function (event) {
-    if (event.target === lightbox) closeLightbox();
-  });
-  document.addEventListener('keydown', function (event) {
-    if (event.key === 'Escape') closeLightbox();
-  });
-});
+loadGallery();

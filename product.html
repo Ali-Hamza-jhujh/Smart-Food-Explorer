@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contact — TasteAI</title>
-<meta name="description" content="Get in touch with the TasteAI team.">
+<title>Dish Detail — TasteAI</title>
+<meta name="description" content="Full recipe detail: ingredients, instructions and photo.">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/layout.css">
 <link rel="stylesheet" href="css/components.css">
 </head>
-<body data-page="contact">
+<body data-page="product">
 
 <header class="site-header">
   <nav class="nav-bar" aria-label="Primary">
@@ -33,51 +33,32 @@
 <main>
   <section>
     <div class="wrap">
-      <div class="eyebrow-rule"><span>Contact</span></div>
-      <h1 style="font-size:2.2rem; margin-bottom: 30px;">Say hello</h1>
+      <a href="menu.html" class="back-link">← Back to menu</a>
 
-      <div class="contact-grid">
-        <form class="contact-form" id="contactForm" novalidate>
-          <div class="form-success" id="formSuccess">Thanks — your message has been received. We'll reply soon.</div>
+      <div class="loader active" id="productLoader">
+        <span class="spinner" aria-hidden="true"></span> Loading recipe…
+      </div>
 
-          <div class="field" id="nameField">
-            <label for="nameInput">Name</label>
-            <input type="text" id="nameInput" name="name" placeholder="Your name">
-            <span class="field-error">Please enter your name.</span>
+      <div class="empty-state" id="productEmpty">This dish couldn't be found. Head back to the menu and pick another.</div>
+
+      <div class="product-hero" id="productHero" style="display:none;">
+        <div class="product-image">
+          <img id="productImg" src="" alt="">
+        </div>
+        <div>
+          <div class="product-tags" id="productTags"></div>
+          <h1 id="productName">—</h1>
+          <p id="productSource"></p>
+
+          <h3>Ingredients</h3>
+          <ul class="ingredient-list" id="productIngredients"></ul>
+
+          <h3>Instructions</h3>
+          <div class="instructions">
+            <p id="productInstructions"></p>
           </div>
 
-          <div class="field" id="emailField">
-            <label for="emailInput">Email</label>
-            <input type="email" id="emailInput" name="email" placeholder="you@example.com">
-            <span class="field-error">Please enter a valid email address.</span>
-          </div>
-
-          <div class="field" id="messageField">
-            <label for="messageInput">Message</label>
-            <textarea id="messageInput" name="message" placeholder="How can we help?"></textarea>
-            <span class="field-error">Please enter a message (at least 10 characters).</span>
-          </div>
-
-          <button type="submit" class="btn btn-primary">Send message</button>
-        </form>
-
-        <div class="contact-info">
-          <div class="info-block">
-            <h4>Email</h4>
-            <p><a href="mailto:hello@tasteai.example">hello@tasteai.example</a></p>
-          </div>
-          <div class="info-block">
-            <h4>Phone</h4>
-            <p>+92 300 1234567</p>
-          </div>
-          <div class="info-block">
-            <h4>Studio</h4>
-            <p>Lahore, Pakistan</p>
-          </div>
-          <div class="info-block">
-            <h4>Note</h4>
-            <p>This is a static demo project — messages are validated in the browser but are not actually sent anywhere.</p>
-          </div>
+          <p id="productVideo"></p>
         </div>
       </div>
     </div>
@@ -114,7 +95,8 @@
   </div>
 </footer>
 
+<script src="js/api.js"></script>
 <script src="js/main.js"></script>
-<script src="js/contact.js"></script>
+<script src="js/product.js"></script>
 </body>
 </html>
