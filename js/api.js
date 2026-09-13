@@ -39,16 +39,34 @@ async function getRandomMeal() {
   return data.meals ? data.meals[0] : null;
 }
 
+/**
+ * TheMealDB's shared free test key can intermittently return an empty
+ * result from filter.php (a known limitation of the public test key,
+ * separate from any account you'd set up). When that happens, this
+ * samples several random meals instead and picks out ones matching the
+ * requested area/category, so the app still gets a real photo and
+ * dish rather than nothing.
+ */
+async function randomFallbackByField(field, value, attempts = 12) {
+  const requests = Array.from({ length: attempts }, () => fetchJSON(`${MEALDB_BASE}/random.php`).catch(() => null));
+  const results = await Promise.all(requests);
+  const meals = results.filter((r) => r && r.meals && r.meals[0]).map((r) => r.meals[0]);
+  const matched = meals.filter((m) => (m[field] || '').toLowerCase() === value.toLowerCase());
+  return matched.length ? matched : meals;
+}
+
 /** Meals filtered by cuisine/area, e.g. "Indian". Returns summary objects only. */
 async function getMealsByArea(area) {
   const data = await fetchJSON(`${MEALDB_BASE}/filter.php?a=${encodeURIComponent(area)}`);
-  return data.meals || [];
+  if (data.meals && data.meals.length) return data.meals;
+  return randomFallbackByField('strArea', area);
 }
 
 /** Meals filtered by TheMealDB category, e.g. "Seafood". */
 async function getMealsByCategory(category) {
   const data = await fetchJSON(`${MEALDB_BASE}/filter.php?c=${encodeURIComponent(category)}`);
-  return data.meals || [];
+  if (data.meals && data.meals.length) return data.meals;
+  return randomFallbackByField('strCategory', category);
 }
 
 /** Search meals by name (also matches partial names). */

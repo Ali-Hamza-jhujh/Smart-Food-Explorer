@@ -15,8 +15,8 @@
    through a backend or serverless proxy that holds the key.
    ========================================================= */
 
-const GEMINI_API_KEY = 'AQ.Ab8RN6JhSBHHuY9nxpFkLlnIkrsVHzW7h3TPBKgGcWV2H8R83g';
-const GEMINI_MODEL = 'gemini-2.0-flash';
+const GEMINI_API_KEY = 'AQ.Ab8RN6JkCE_HD8S7zai5vkJt_Mb5kSbmViqdcnWSa16cCCkILg';
+const GEMINI_MODEL = 'gemini-3.6-flash';
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 const aiForm = document.getElementById('aiForm');
@@ -90,19 +90,36 @@ Recommend exactly one real, well-known ${cuisineLabel(cuisine)} dish that fits, 
 Respond with ONLY valid JSON, no markdown, in exactly this shape:
 {"dish": "Dish Name", "reason": "one short sentence explaining why it fits", "alternatives": ["Dish A", "Dish B", "Dish C"]}`;
 
-  const response = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+  const response = await fetch(GEMINI_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-goog-api-key': GEMINI_API_KEY,
+    },
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.7, maxOutputTokens: 300 },
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 1000,
+      },
     }),
   });
 
-  if (!response.ok) throw new Error(`Gemini request failed (${response.status})`);
+  if (!response.ok) {
+    const detail = await response.text().catch(() => '');
+    console.error('Gemini error response:', detail);
+    throw new Error(`Gemini request failed (${response.status})`);
+  }
 
   const data = await response.json();
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+  if (!text) {
+    const finishReason = data?.candidates?.[0]?.finishReason;
+    console.error('Gemini returned no text (finishReason:', finishReason, ') — full response:', data);
+    throw new Error('Gemini returned an empty response');
+  }
+
   const cleaned = text.replace(/```json|```/g, '').trim();
   const parsed = JSON.parse(cleaned);
 
@@ -118,7 +135,14 @@ async function matchRealDish(dishName, cuisine) {
     const matches = await searchMealsByName(dishName);
     if (matches.length) return matches[0];
   } catch (err) {
-    /* fall through to area fallback below */
+    /* fall through to the simplified search below */
+  }
+  try {
+    const firstWord = dishName.split(' ')[0];
+    const matches = await searchMealsByName(firstWord);
+    if (matches.length) return matches[0];
+  } catch (err) {
+    /* fall through to the area fallback below */
   }
   try {
     const area = CUISINE_TO_AREA[cuisine] || 'Indian';
@@ -128,7 +152,7 @@ async function matchRealDish(dishName, cuisine) {
       return await getMealById(random.idMeal);
     }
   } catch (err) {
-    /* no match available */
+    console.error('Could not find a real dish match:', err);
   }
   return null;
 }
@@ -180,6 +204,7 @@ async function generateRecommendation(mood, cuisine, hunger) {
     }
     recommendation = await askGemini(mood, cuisine, hunger);
   } catch (err) {
+    console.error('Falling back to local recommendation because:', err);
     usedFallback = true;
     recommendation = localRecommendation(mood, cuisine, hunger);
   }
