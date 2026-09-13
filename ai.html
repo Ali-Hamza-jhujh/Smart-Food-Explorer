@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Recommendation — TasteAI</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav-bar" aria-label="Main navigation">
+        <a class="brand" href="index.html">Taste<span>AI</span></a>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="menu.html">Menu</a></li>
+          <li><a href="ai.html">AI Recommendation</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <button
+          class="hamburger"
+          aria-label="Toggle menu"
+          aria-expanded="false"
+        >
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <section>
+        <div class="container ai-layout">
+          <article>
+            <div class="ai-panel-title">
+              <span class="badge">🤖</span>
+              <h1 style="margin: 0">AI Food Assistant</h1>
+            </div>
+
+            <form class="form-card" id="ai-form" novalidate>
+              <div class="field">
+                <label for="mood">What are you in the mood for?</label>
+                <select id="mood" name="mood" required>
+                  <option value="">Choose a mood</option>
+                  <option value="spicy">Spicy</option>
+                  <option value="mild">Mild</option>
+                  <option value="sweet">Sweet</option>
+                  <option value="savory">Savory</option>
+                  <option value="comfort">Comfort Food</option>
+                  <option value="light">Light</option>
+                </select>
+                <div class="field-error" id="mood-error"></div>
+              </div>
+
+              <div class="field">
+                <label for="type">What type of food?</label>
+                <select id="type" name="type" required>
+                  <option value="">Choose a cuisine</option>
+                  <option value="Pakistani">Pakistani</option>
+                  <option value="Fast Food">Fast Food</option>
+                  <option value="Chinese">Chinese</option>
+                  <option value="Continental">Continental</option>
+                  <option value="Desserts">Desserts</option>
+                  <option value="Drinks">Drinks</option>
+                </select>
+                <div class="field-error" id="type-error"></div>
+              </div>
+
+              <div class="field">
+                <label for="hunger">How hungry are you?</label>
+                <select id="hunger" name="hunger" required>
+                  <option value="">Choose your appetite</option>
+                  <option value="snack">Just a Snack</option>
+                  <option value="moderate">Moderately Hungry</option>
+                  <option value="very">Very Hungry</option>
+                  <option value="starving">Starving</option>
+                </select>
+                <div class="field-error" id="hunger-error"></div>
+              </div>
+
+              <button
+                type="submit"
+                class="btn btn-primary"
+                style="width: 100%; justify-content: center"
+              >
+                Get Recommendation
+              </button>
+            </form>
+          </article>
+
+          <div class="result-panel" id="result-panel">
+            <div class="result-placeholder" id="result-placeholder">
+              <span class="big-emoji">🍽️</span>
+              <p>Fill in the form and TasteAI will suggest your next meal.</p>
+            </div>
+
+            <div class="loader" id="loader">
+              <div class="spinner" aria-hidden="true"></div>
+              <span>Thinking about your cravings…</span>
+            </div>
+
+            <div class="result-content" id="result-content">
+              <p
+                class="eyebrow"
+                style="color: var(--color-gold); font-weight: 600"
+              >
+                ✨ AI Recommendation
+              </p>
+              <div class="result-hero">
+                <div class="emoji-badge" id="result-tile">
+                  <span id="result-emoji"></span>
+                </div>
+                <div>
+                  <h2 id="result-name" style="margin: 0"></h2>
+                  <span class="dish-price" id="result-price"></span>
+                </div>
+              </div>
+              <p id="result-description"></p>
+              <div class="result-why">
+                <strong>Why?</strong>
+                <p id="result-why" style="margin: 6px 0 0"></p>
+              </div>
+              <div class="also-like">
+                <strong>You may also like:</strong>
+                <ul id="also-like-list"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <a class="brand" href="index.html">Taste<span>AI</span></a>
+          <p class="footer-note">Smart food recommendations, no guesswork.</p>
+        </div>
+        <div>
+          <p class="footer-note">📞 +92 300 1234567<br />📍 Lahore, Pakistan</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/ai.js"></script>
+  </body>
+</html>
