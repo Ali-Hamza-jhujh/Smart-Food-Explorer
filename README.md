@@ -7,14 +7,14 @@ server, database, or framework required.
 
 ## Live features
 
-| Page | What it does |
-|---|---|
-| **Home** (`index.html`) | Hero with a live "today's pick" photo, a 3-step "how it works" explainer, and a preview of featured dishes. |
-| **Menu** (`menu.html`) | Browse real dishes with search-by-name, cuisine, and category filters, plus "Show more dishes" pagination. |
-| **AI Recommendation** (`ai.html`) | Pick a mood, cuisine, and hunger level; the AI Food Assistant names one real dish that fits, explains why, and suggests three alternatives. |
-| **Gallery** (`gallery.html`) | A shuffled photo grid across 8 cuisines with "Show more photos" pagination. |
-| **Contact** (`contact.html`) | A contact form with client-side validation (name, email format, message length). No backend exists, so submitting shows a confirmation message only. |
-| **Dish detail** (`product.html?id=...`) | Full recipe: photo, ingredients with measurements, instructions, and a video link when available. |
+| Page                                    | What it does                                                                                                                                         |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Home** (`index.html`)                 | Hero with a live "today's pick" photo, a 3-step "how it works" explainer, and a preview of featured dishes.                                          |
+| **Menu** (`menu.html`)                  | Browse real dishes with search-by-name, cuisine, and category filters, plus "Show more dishes" pagination.                                           |
+| **AI Recommendation** (`ai.html`)       | Pick a mood, cuisine, and hunger level; the AI Food Assistant names one real dish that fits, explains why, and suggests three alternatives.          |
+| **Gallery** (`gallery.html`)            | A shuffled photo grid across 8 cuisines with "Show more photos" pagination.                                                                          |
+| **Contact** (`contact.html`)            | A contact form with client-side validation (name, email format, message length). No backend exists, so submitting shows a confirmation message only. |
+| **Dish detail** (`product.html?id=...`) | Full recipe: photo, ingredients with measurements, instructions, and a video link when available.                                                    |
 
 ## Tech stack
 
@@ -86,7 +86,7 @@ sweet option to offer.
 1. Get a free key from [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
 2. Open `js/ai.js` and paste it in at the top:
    ```js
-   const GEMINI_API_KEY = 'your-real-key-here';
+   const GEMINI_API_KEY = "your-real-key-here";
    ```
 3. That's it. Reload the AI Recommendation page and submit the form.
 
@@ -137,6 +137,7 @@ requirements. All "dynamic" behavior (search, filtering, the AI call,
 pagination) happens client-side in the browser via `fetch()`.
 
 Technologies demonstrated:
+
 - HTML5 semantic elements, forms
 - CSS Flexbox, Grid, media queries, hover states, transitions/animations
 - JavaScript: hamburger menu, form validation, dynamic filtering,

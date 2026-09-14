@@ -40,12 +40,51 @@ async function getRandomMeal() {
 }
 
 /**
+ * A short list of real, well-known dishes per area — including a couple of
+ * desserts — used as a fallback source when filter.php comes back empty.
+ * Not every name here is guaranteed to exist in TheMealDB; searchMealsByNames
+ * simply drops whichever ones don't resolve, so it's safe to list generously.
+ */
+const AREA_SEED_DISHES = {
+  Indian: ['Chicken Karahi', 'Chicken Handi', 'Chicken Tikka Masala', 'Rogan Josh', 'Chana Masala',
+    'Palak Paneer', 'Chicken Korma', 'Vegetable Korma', 'Chicken Biryani', 'Bhindi Masala',
+    'Aloo Gobi', 'Gulab Jamun', 'Kheer', 'Kulfi'],
+  Chinese: ['Kung Pao Chicken', 'Chow Mein', 'Sweet and Sour Pork', 'Spring Rolls',
+    'Chicken Fried Rice', 'Egg Fried Rice', 'Dan Dan Noodles', 'Beef Chow Fun'],
+  Italian: ['Spaghetti Carbonara', 'Spaghetti Bolognese', 'Margherita Pizza', 'Lasagne',
+    'Risotto Nero', 'Tiramisu', 'Chicken Piccata', 'Ravioli'],
+  Mexican: ['Chicken Enchiladas', 'Tacos', 'Chilli Con Carne', 'Nachos', 'Guacamole',
+    'Chicken Fajita Mix', 'Beef Burrito'],
+  American: ['BBQ Pulled Pork', 'Classic Burger', 'Mac and Cheese', 'Fried Chicken',
+    'Apple Pie', 'Buffalo Chicken', 'BBQ Ribs'],
+  Greek: ['Greek Salad', 'Moussaka', 'Souvlaki', 'Baklava', 'Spanakopita'],
+  Japanese: ['Chicken Katsu', 'Teriyaki Salmon', 'Ramen', 'Gyoza', 'Chicken Yakitori', 'Katsu Curry'],
+  Thai: ['Thai Green Curry', 'Pad Thai', 'Tom Yum Soup', 'Mango Sticky Rice', 'Thai Red Curry'],
+  British: ['Beef Wellington', 'Fish and Chips', "Shepherd's Pie", 'Full English Breakfast', 'Sticky Toffee Pudding'],
+};
+
+/** Looks up several dish names in parallel via search.php and returns the unique real matches found. */
+async function searchMealsByNames(names) {
+  const requests = names.map((name) => searchMealsByName(name).catch(() => []));
+  const results = await Promise.all(requests);
+  const seen = new Set();
+  const meals = [];
+  results.flat().forEach((meal) => {
+    if (meal && !seen.has(meal.idMeal)) {
+      seen.add(meal.idMeal);
+      meals.push(meal);
+    }
+  });
+  return meals;
+}
+
+/**
  * TheMealDB's shared free test key can intermittently return an empty
  * result from filter.php (a known limitation of the public test key,
- * separate from any account you'd set up). When that happens, this
- * samples several random meals instead and picks out ones matching the
- * requested area/category, so the app still gets a real photo and
- * dish rather than nothing.
+ * separate from any account you'd set up). When that happens, this falls
+ * back to searching for a curated list of real dishes from the SAME area,
+ * so the app still shows dishes that actually belong to that cuisine
+ * rather than random unrelated ones.
  */
 async function randomFallbackByField(field, value, attempts = 12) {
   const requests = Array.from({ length: attempts }, () => fetchJSON(`${MEALDB_BASE}/random.php`).catch(() => null));
@@ -59,6 +98,13 @@ async function randomFallbackByField(field, value, attempts = 12) {
 async function getMealsByArea(area) {
   const data = await fetchJSON(`${MEALDB_BASE}/filter.php?a=${encodeURIComponent(area)}`);
   if (data.meals && data.meals.length) return data.meals;
+
+  const seeds = AREA_SEED_DISHES[area];
+  if (seeds) {
+    const seeded = await searchMealsByNames(seeds);
+    if (seeded.length) return seeded;
+  }
+
   return randomFallbackByField('strArea', area);
 }
 
